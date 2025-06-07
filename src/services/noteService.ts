@@ -82,7 +82,7 @@ export function subscribeToNotes(
     },
     (error) => {
       if (onError) {
-        console.error('Error in subscribeToNotes:', error);
+        //! console.error('Error in subscribeToNotes:', error);
         onError(error);
       }
     },

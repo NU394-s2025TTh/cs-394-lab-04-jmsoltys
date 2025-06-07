@@ -25,7 +25,7 @@ const NoteItem: React.FC<NoteItemProps> = ({ note, onEdit }) => {
         await deleteNote(note.id);
         return; // tests didnt like it when I setIsDeleting(false) here, so I returned early
       } catch (err) {
-        console.error('Error in handleDelete in NoteItem:', err);
+        //! console.error('Error in handleDelete in NoteItem:', err);
         setError((err as Error).message);
       }
     }

@@ -74,7 +74,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ initialNote, onSave }) => {
         });
       }
     } catch (error) {
-      console.error('Error in handleSubmit:', error);
+      //! console.error('Error in handleSubmit:', error);
       setError('Error in handleSubmit: ' + (error as Error).message);
     }
 
