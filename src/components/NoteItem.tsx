@@ -1,19 +1,43 @@
 // REFERENCE SOLUTION - Do not distribute to students
 // src/components/NoteItem.tsx
-import React from 'react';
+import React, { useState } from 'react';
 
+import { deleteNote } from '../services/noteService';
 import { Note } from '../types/Note';
 
 interface NoteItemProps {
   note: Note;
   onEdit?: (note: Note) => void;
 }
-// TODO: delete eslint-disable-next-line when you implement the onEdit handler
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 const NoteItem: React.FC<NoteItemProps> = ({ note, onEdit }) => {
-  // TODO: manage state for deleting status and error message
-  // TODO: create a function to handle the delete action, which will display a confirmation (window.confirm) and call the deleteNote function from noteService,
+  //* DONE: manage state for deleting status and error message
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  //* DONE: create a function to handle the delete action, which will display a confirmation (window.confirm) and call the deleteNote function from noteService,
   // and update the deleting status and error message accordingly
+  const handleDelete = async () => {
+    setIsDeleting(true);
+
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      try {
+        await deleteNote(note.id);
+        return; // tests didnt like it when I setIsDeleting(false) here, so I returned early
+      } catch (err) {
+        console.error('Error in handleDelete in NoteItem:', err);
+        setError((err as Error).message);
+      }
+    }
+
+    setIsDeleting(false);
+  };
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(note);
+    }
+  };
 
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -60,18 +84,26 @@ const NoteItem: React.FC<NoteItemProps> = ({ note, onEdit }) => {
 
     return 'just now';
   };
-  // TODO: handle edit noteEdit action by calling the onEdit prop with the note object
-  // TODO: handle delete note action by calling a deleteNote function from noteService
-  // TODO: disable the delete button and edit button while deleting
-  // TODO: show error message if there is an error deleting the note
-  // TODO: only show the edit button when the onEdit prop is provided
+
+  //* DONE: handle edit noteEdit action by calling the onEdit prop with the note object
+  //* DONE: handle delete note action by calling a deleteNote function from noteService
+  //* DONE: disable the delete button and edit button while deleting
+  //* DONE: show error message if there is an error deleting the note
+  //* DONE: only show the edit button when the onEdit prop is provided
   return (
     <div className="note-item">
       <div className="note-header">
+        {error && <p>Failed to delete note.</p>}
         <h3>{note.title}</h3>
         <div className="note-actions">
-          <button className="edit-button">Edit</button>
-          <button className="delete-button">{'Delete'}</button>
+          {onEdit && (
+            <button className="edit-button" disabled={isDeleting} onClick={handleEdit}>
+              Edit
+            </button>
+          )}
+          <button className="delete-button" disabled={isDeleting} onClick={handleDelete}>
+            {isDeleting ? 'Deleting...' : 'Delete'}
+          </button>
         </div>
       </div>
       <div className="note-content">{note.content}</div>
