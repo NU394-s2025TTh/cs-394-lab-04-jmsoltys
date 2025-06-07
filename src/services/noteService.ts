@@ -19,7 +19,8 @@ export async function saveNote(note: Note): Promise<void> {
   //* DONE: save the note to Firestore in the NOTES_COLLECTION collection
   // Use setDoc to create or update the note document; throw an error if it fails
   try {
-    await setDoc(doc(db, NOTES_COLLECTION, note.id), note, { merge: true });
+    // should call setDoc with the correct parameters, using either collection or full path
+    await setDoc(doc(collection(db, NOTES_COLLECTION), note.id), note);
   } catch (error) {
     console.error('Error in saveNote:', error);
     throw new Error(`Error in saveNote: ${error}`);
@@ -35,7 +36,7 @@ export async function deleteNote(noteId: string): Promise<void> {
   //* DONE: delete the note from Firestore in the NOTES_COLLECTION collection
   // Use deleteDoc to remove the note document; throw an error if it fails
   try {
-    await deleteDoc(doc(db, NOTES_COLLECTION, noteId));
+    await deleteDoc(doc(collection(db, NOTES_COLLECTION), noteId));
   } catch (error) {
     console.error('Error in deleteNote:', error);
     throw new Error(`Error in deleteNote: ${error}`);
