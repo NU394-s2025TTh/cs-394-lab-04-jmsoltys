@@ -17,11 +17,11 @@ const NoteList: React.FC<NoteListProps> = ({ onEditNote }) => {
 
   //* DONE: load notes using subscribeToNotes from noteService, use useEffect to manage the subscription; try/catch to handle errors (see lab 3)
   //* DONE: handle unsubscribing from the notes when the component unmounts
-  try {
-    useEffect(() => {
-      // 1. Set loading state
-      setIsLoading(true);
+  useEffect(() => {
+    // 1. Set loading state
+    setIsLoading(true);
 
+    try {
       // 2. Subscribe to data
       const unsubscribe = subscribeToNotes(
         (notes) => {
@@ -43,21 +43,24 @@ const NoteList: React.FC<NoteListProps> = ({ onEditNote }) => {
       return () => {
         unsubscribe();
       };
-    }, []); // Empty dependency array = run once on mount
-  } catch (error) {
-    console.error('Error in NoteList when loading notes using subscribeToNotes:', error);
-    setError(
-      error instanceof Error
-        ? error.message
-        : 'Error in NoteList when loading notes using subscribeToNotes',
-    );
-    setIsLoading(false);
-  }
+    } catch (error) {
+      console.error(
+        'Error in NoteList when loading notes using subscribeToNotes:',
+        error,
+      );
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'Error in NoteList when loading notes using subscribeToNotes',
+      );
+      setIsLoading(false);
+    }
+  }, []); // Empty dependency array = run once on mount
 
   return (
     <div className="note-list">
       <h2>Notes</h2>
-      {error && <p>{error}</p>}
+      {error && <p>Error: {error}</p>}
       {isLoading ? (
         <p>Loading notes...</p>
       ) : Object.values(notesList).length === 0 ? (
