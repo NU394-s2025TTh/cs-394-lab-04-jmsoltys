@@ -1,38 +1,71 @@
 // src/components/NoteList.tsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-// TODO: import { subscribeToNotes } from '../services/noteService';
+import { subscribeToNotes } from '../services/noteService';
 import { Note, Notes } from '../types/Note';
 import NoteItem from './NoteItem';
 
 interface NoteListProps {
   onEditNote?: (note: Note) => void;
 }
-// TODO: remove the eslint-disable-next-line when you implement the onEditNote handler
-const NoteList: React.FC<NoteListProps> = ({ onEditNote }) => {
-  // TODO: load notes using subscribeToNotes from noteService, use useEffect to manage the subscription; try/catch to handle errors (see lab 3)
-  // TODO: handle unsubscribing from the notes when the component unmounts
-  // TODO: manage state for notes, loading status, and error message
-  // TODO: display a loading message while notes are being loaded; error message if there is an error
 
-  // Notes is a constant in this template but needs to be a state variable in your implementation and load from firestore
-  const notes: Notes = {
-    '1': {
-      id: '1',
-      title: 'Note 1',
-      content: 'This is the content of note 1.',
-      lastUpdated: Date.now() - 100000,
-    },
-  };
+const NoteList: React.FC<NoteListProps> = ({ onEditNote }) => {
+  //* DONE: manage state for notes, loading status, and error message
+  const [notesList, setNotesList] = useState<Notes>({});
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  //* DONE: load notes using subscribeToNotes from noteService, use useEffect to manage the subscription; try/catch to handle errors (see lab 3)
+  //* DONE: handle unsubscribing from the notes when the component unmounts
+  try {
+    useEffect(() => {
+      // 1. Set loading state
+      setIsLoading(true);
+
+      // 2. Subscribe to data
+      const unsubscribe = subscribeToNotes(
+        (notes) => {
+          setNotesList(notes);
+          setIsLoading(false);
+        },
+        (error) => {
+          console.error('Error when calling subscribeToNotes from NoteList:', error);
+          setError(
+            error instanceof Error
+              ? error.message
+              : 'Error when calling subscribeToNotes from NoteList',
+          );
+          setIsLoading(false);
+        },
+      );
+
+      // 3. Return cleanup function
+      return () => {
+        unsubscribe();
+      };
+    }, []); // Empty dependency array = run once on mount
+  } catch (error) {
+    console.error('Error in NoteList when loading notes using subscribeToNotes:', error);
+    setError(
+      error instanceof Error
+        ? error.message
+        : 'Error in NoteList when loading notes using subscribeToNotes',
+    );
+    setIsLoading(false);
+  }
 
   return (
     <div className="note-list">
       <h2>Notes</h2>
-      {Object.values(notes).length === 0 ? (
+      {error && <p>{error}</p>}
+      {isLoading ? (
+        <p>Loading notes...</p>
+      ) : Object.values(notesList).length === 0 ? (
+        // If no notes, show a message
         <p>No notes yet. Create your first note!</p>
       ) : (
         <div className="notes-container">
-          {Object.values(notes)
+          {Object.values(notesList)
             // Sort by lastUpdated (most recent first)
             .sort((a, b) => b.lastUpdated - a.lastUpdated)
             .map((note) => (
