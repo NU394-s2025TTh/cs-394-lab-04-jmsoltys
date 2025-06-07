@@ -89,7 +89,7 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ initialNote, onSave }) => {
     <form onSubmit={handleSubmit} className="note-editor">
       {error && (
         <div>
-          <p>Error when saving note: {error}</p>
+          <p>Failed to save note</p>
         </div>
       )}
 
@@ -135,7 +135,10 @@ const NoteEditor: React.FC<NoteEditorProps> = ({ initialNote, onSave }) => {
       </div>
 
       <div className="form-actions">
-        <button type="submit">{currentlySaving ? 'Saving...' : 'Save Note'}</button>
+        {/* button should be 'Saving' if saving, otherwise 'Update Note' when initialNote is provided, else 'SaveNote' */}
+        <button type="submit">
+          {currentlySaving ? 'Saving...' : initialNote ? 'Update Note' : 'Save Note'}
+        </button>
       </div>
     </form>
   );
